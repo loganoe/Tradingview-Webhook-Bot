@@ -11,6 +11,7 @@ https://discord.gg/Qb9unmxD6D
 - [Bybit](https://partner.bybit.com/b/webhookbot)
 - [Binance Futures](https://www.binance.com/en/register?ref=LMFD8MJ5)
 - [Binance Spot](https://www.binance.com/en/register?ref=LMFD8MJ5)
+- [KuCoin](https://www.kucoin.com/)
 - More will be done on request or can be added by submitting a pull request.
 
 <br>
@@ -122,7 +123,7 @@ _Now when your alerts fire off they should go strait to your server and get proc
 | Constant |Settings Keys  |
 |--|--|
 |key| unique key that protects your webhook server|
-|exchange | bybit, binance-futures, binance-spot |
+|exchange | bybit, binance-futures, binance-spot, kucoin |
 |symbol | Exchange Specific ** See Below for more |
 |side|Buy or Sell		|
 |type | Market or Limit		|
@@ -142,3 +143,4 @@ _Now when your alerts fire off they should go strait to your server and get proc
 |BYBIT PERP | BTCUSDT|
 |Binance Futures | BTC/USDT|
 |Binance Spot | BTC/USDT|
+|KuCoin | BTC/USDT|

@@ -18,6 +18,13 @@
              "API_SECRET": "api-secret-goes-here",
              "ENABLED": false,
              "TESTNET": false
+        },
+        "KUCOIN": {
+             "API_KEY": "api-key-goes-here",
+             "API_SECRET": "api-secret-goes-here",
+             "API_PASSPHRASE": "api-passphrase-goes-here",
+             "ENABLED": false,
+             "TESTNET": false
         }
    }
 

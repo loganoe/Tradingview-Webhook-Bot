@@ -5,6 +5,7 @@ import time
 import ccxt
 from binanceFutures import Bot as BinanceFuturesBot
 from binanceSpot import Bot as BinanceSpotBot
+from kucoin import Bot as KuCoinBot
 
 def validate_bybit_api_key(session):
     try:
@@ -14,12 +15,12 @@ def validate_bybit_api_key(session):
         print("Bybit API key validation failed:", str(e))
         return False
 
-def validate_binance_api_key(exchange):
+def validate_exchange_api_key(exchange, exchange_name):
     try:
         result = exchange.fetch_balance()
         return True
     except Exception as e:
-        print("Binance API key validation failed:", str(e))
+        print(exchange_name + " API key validation failed:", str(e))
         return False
 
 app = Flask(__name__)
@@ -97,15 +98,36 @@ if use_bybit:
 
 # Validate Binance Futures API key
 if use_binance_futures:
-    if not validate_binance_api_key(binance_futures_exchange):
+    if not validate_exchange_api_key(binance_futures_exchange, "Binance Futures"):
         print("Invalid Binance Futures API key.")
         use_binance_futures = False
 
 # Validate Binance Spot API key
 if use_binance_spot:
-    if not validate_binance_api_key(binance_spot_exchange):
+    if not validate_exchange_api_key(binance_spot_exchange, "Binance Spot"):
         print("Invalid Binance Spot API key.")
         use_binance_spot = False
+
+use_kucoin = False
+kucoin_exchange = None
+if 'KUCOIN' in config['EXCHANGES']:
+    if config['EXCHANGES']['KUCOIN']['ENABLED']:
+        print("KuCoin is enabled!")
+        use_kucoin = True
+
+        kucoin_exchange = ccxt.kucoin({
+            'apiKey': config['EXCHANGES']['KUCOIN']['API_KEY'],
+            'secret': config['EXCHANGES']['KUCOIN']['API_SECRET'],
+            'password': config['EXCHANGES']['KUCOIN']['API_PASSPHRASE'],
+        })
+        if config['EXCHANGES']['KUCOIN'].get('TESTNET'):
+            kucoin_exchange.set_sandbox_mode(True)
+
+# Validate KuCoin API key
+if use_kucoin:
+    if not validate_exchange_api_key(kucoin_exchange, "KuCoin"):
+        print("Invalid KuCoin API key.")
+        use_kucoin = False
 
 @app.route('/')
 def index():
@@ -218,6 +240,17 @@ def webhook():
             return {
                 "status": "success",
                 "message": "Binance Spot Webhook Received!"
+            }
+    ##############################################################################
+    #             KuCoin
+    ##############################################################################
+    if data['exchange'] == 'kucoin':
+        if use_kucoin:
+            bot = KuCoinBot(exchange_override=kucoin_exchange)
+            bot.run(data)
+            return {
+                "status": "success",
+                "message": "KuCoin Webhook Received!"
             }
 
     print("Invalid Exchange, Please Try Again!")
