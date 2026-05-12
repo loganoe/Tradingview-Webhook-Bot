@@ -12,6 +12,12 @@
              "API_SECRET": "api-secret-goes-here",
              "ENABLED": false,
              "TESTNET": false
+        },
+        "BINANCE-SPOT": {
+             "API_KEY": "api-key-goes-here",
+             "API_SECRET": "api-secret-goes-here",
+             "ENABLED": false,
+             "TESTNET": false
         }
    }
 

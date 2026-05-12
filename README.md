@@ -10,6 +10,7 @@ https://discord.gg/Qb9unmxD6D
 #### Current Exchanges 
 - [Bybit](https://partner.bybit.com/b/webhookbot)
 - [Binance Futures](https://www.binance.com/en/register?ref=LMFD8MJ5)
+- [Binance Spot](https://www.binance.com/en/register?ref=LMFD8MJ5)
 - More will be done on request or can be added by submitting a pull request.
 
 <br>
@@ -21,6 +22,8 @@ https://discord.gg/Qb9unmxD6D
 [Create Bybit Account](https://partner.bybit.com/b/webhookbot)
 
 [Create Binance Futures Account](https://www.binance.com/en/register?ref=LMFD8MJ5)
+
+[Create Binance Spot Account](https://www.binance.com/en/register?ref=LMFD8MJ5)
 
 <br>
 <br>
@@ -119,7 +122,7 @@ _Now when your alerts fire off they should go strait to your server and get proc
 | Constant |Settings Keys  |
 |--|--|
 |key| unique key that protects your webhook server|
-|exchange | bybit, binacne-futures |
+|exchange | bybit, binance-futures, binance-spot |
 |symbol | Exchange Specific ** See Below for more |
 |side|Buy or Sell		|
 |type | Market or Limit		|
@@ -138,3 +141,4 @@ _Now when your alerts fire off they should go strait to your server and get proc
 |BYBIT INVERSE| BTCUSD|
 |BYBIT PERP | BTCUSDT|
 |Binance Futures | BTC/USDT|
+|Binance Spot | BTC/USDT|

@@ -3,7 +3,8 @@ from flask import Flask, render_template, request, jsonify
 from pybit import HTTP
 import time
 import ccxt
-from binanceFutures import Bot
+from binanceFutures import Bot as BinanceFuturesBot
+from binanceSpot import Bot as BinanceSpotBot
 
 def validate_bybit_api_key(session):
     try:
@@ -46,24 +47,47 @@ if 'BYBIT' in config['EXCHANGES']:
     )
 
 use_binance_futures = False
+binance_futures_exchange = None
 if 'BINANCE-FUTURES' in config['EXCHANGES']:
     if config['EXCHANGES']['BINANCE-FUTURES']['ENABLED']:
-        print("Binance is enabled!")
+        print("Binance Futures is enabled!")
         use_binance_futures = True
 
-        exchange = ccxt.binance({
-        'apiKey': config['EXCHANGES']['BINANCE-FUTURES']['API_KEY'],
-        'secret': config['EXCHANGES']['BINANCE-FUTURES']['API_SECRET'],
-        'options': {
-            'defaultType': 'future',
+        binance_futures_options = {
+            'apiKey': config['EXCHANGES']['BINANCE-FUTURES']['API_KEY'],
+            'secret': config['EXCHANGES']['BINANCE-FUTURES']['API_SECRET'],
+            'options': {
+                'defaultType': 'future',
             },
-        'urls': {
-            'api': {
-                'public': 'https://testnet.binancefuture.com/fapi/v1',
-                'private': 'https://testnet.binancefuture.com/fapi/v1',
-            }, }
+        }
+        if config['EXCHANGES']['BINANCE-FUTURES'].get('TESTNET'):
+            binance_futures_options['urls'] = {
+                'api': {
+                    'public': 'https://testnet.binancefuture.com/fapi/v1',
+                    'private': 'https://testnet.binancefuture.com/fapi/v1',
+                },
+            }
+
+        binance_futures_exchange = ccxt.binance(binance_futures_options)
+        if config['EXCHANGES']['BINANCE-FUTURES'].get('TESTNET'):
+            binance_futures_exchange.set_sandbox_mode(True)
+
+use_binance_spot = False
+binance_spot_exchange = None
+if 'BINANCE-SPOT' in config['EXCHANGES']:
+    if config['EXCHANGES']['BINANCE-SPOT']['ENABLED']:
+        print("Binance Spot is enabled!")
+        use_binance_spot = True
+
+        binance_spot_exchange = ccxt.binance({
+            'apiKey': config['EXCHANGES']['BINANCE-SPOT']['API_KEY'],
+            'secret': config['EXCHANGES']['BINANCE-SPOT']['API_SECRET'],
+            'options': {
+                'defaultType': 'spot',
+            },
         })
-        exchange.set_sandbox_mode(True)
+        if config['EXCHANGES']['BINANCE-SPOT'].get('TESTNET'):
+            binance_spot_exchange.set_sandbox_mode(True)
 
 # Validate Bybit API key
 if use_bybit:
@@ -73,9 +97,15 @@ if use_bybit:
 
 # Validate Binance Futures API key
 if use_binance_futures:
-    if not validate_binance_api_key(exchange):
+    if not validate_binance_api_key(binance_futures_exchange):
         print("Invalid Binance Futures API key.")
         use_binance_futures = False
+
+# Validate Binance Spot API key
+if use_binance_spot:
+    if not validate_binance_api_key(binance_spot_exchange):
+        print("Invalid Binance Spot API key.")
+        use_binance_spot = False
 
 @app.route('/')
 def index():
@@ -170,23 +200,31 @@ def webhook():
     ##############################################################################
     #             Binance Futures
     ##############################################################################
-        if data['exchange'] == 'binance-futures':
-            if use_binance_futures:
-                bot = Bot()
-                bot.run(data)
-                return {
-                    "status": "success",
-                    "message": "Binance Futures Webhook Received!"
-                }
-
-        else:
-            print("Invalid Exchange, Please Try Again!")
+    if data['exchange'] == 'binance-futures':
+        if use_binance_futures:
+            bot = BinanceFuturesBot(exchange_override=binance_futures_exchange)
+            bot.run(data)
             return {
-                "status": "error",
-                "message": "Invalid Exchange, Please Try Again!"
+                "status": "success",
+                "message": "Binance Futures Webhook Received!"
             }
+    ##############################################################################
+    #             Binance Spot
+    ##############################################################################
+    if data['exchange'] == 'binance-spot':
+        if use_binance_spot:
+            bot = BinanceSpotBot(exchange_override=binance_spot_exchange)
+            bot.run(data)
+            return {
+                "status": "success",
+                "message": "Binance Spot Webhook Received!"
+            }
+
+    print("Invalid Exchange, Please Try Again!")
+    return {
+        "status": "error",
+        "message": "Invalid Exchange, Please Try Again!"
+    }
 
 if __name__ == '__main__':
     app.run(debug=False)
-
-
